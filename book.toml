@@ -1,0 +1,12 @@
+[book]
+authors = ["Kienyew"]
+language = "en"
+multilingual = false
+src = "src"
+title = "CDCL From Scratch in Python"
+
+[output.html]
+mathjax-support = true
+
+[output.html.mathjax]
+extensions = ["mediawiki-texvc.js"]
