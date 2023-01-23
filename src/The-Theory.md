@@ -195,7 +195,7 @@ The table shows the resolution steps during clause learning.
 
 There are many possible clauses to learn on one conflict. The learnt clause of method above is just the negation of literals of most recent decision level. However, we usually learn a new exploit the first UIP cut, explained in the next section:
 
-### Exploiting Structure with UIPs {#expoiting-structure-with-uips}
+### Exploiting Structure with UIPs
 
 A vertex \\(u\\) dominates another vertex \\(x\\) in a directed graph if every path from \\(x\\) to another vertex \\(\kappa\\) contains \\(u\\). A UIP (unique implication point) is a **dominator** in the implication graph, which dominates the decision vertex \\(x\\) with respect to the conflict vertex \\(\kappa\\).
 

@@ -94,6 +94,7 @@ The formula is just a list of clauses. We remove duplicate literals like \\((1âˆ
 @dataclass
 class Formula:
     clauses: List[Clause]
+    __variables: Set[int]
 
     def __init__(self, clauses: List[Clause]):
         """
