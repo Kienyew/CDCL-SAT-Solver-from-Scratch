@@ -74,10 +74,10 @@ $$
 \alpha(x_i) \in \phi \cup\\{\tt{NIL}\\}
 $$
 
-The decision level for a variable \\(x_i\\) denotes the depth of the decision tree at which the variable is assigned a value in \\(\\{0,1\\}\\). The decision level for an unassigned value \\(x_i\\) is \\(-1\\).
+The **decision level** for a variable \\(x_i\\) denotes the depth of the decision tree at which the variable is assigned a value in \\(\\{0,1\\}\\). The decision level for an unassigned value \\(x_i\\) is \\(-1\\).
 
 $$
-\delta(x_i) = \max(\\{0\\}\cup \\{\delta(x_j) \mid x_j \in w ∧ x_j \ne i\\})
+\delta(x_i) = \max(\\{0\\}\cup \\{\delta(x_j) \mid x_j \in w ∧ x_j \ne x_i\\})
 $$
 
 The formula above says that the decision level of an implied literal is either the highest decision level of the implied literals in a unit clause, or \\(0\\) if the clause is unit.

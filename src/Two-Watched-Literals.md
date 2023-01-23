@@ -16,6 +16,7 @@ First, we initialize the core data structure `lit2clauses` and `clause2lits`, wh
 - `clause2lits[c]` are the literals that clause `c` are watching now. If `c` is unit clause, `len(clause2lits[c]) == 1` or else `len(clause2lits[c]) == 2`.
 
 ```python
+from collections import defaultdict
 def init_watches(formula: Formula):
     """
     Return lit2clauses and clause2lits
@@ -39,7 +40,7 @@ def init_watches(formula: Formula):
     return lit2clauses, clause2lits
 ```
 
-We also add `__hash__ ` function to the dataclass decorator to the `Clause` class for it to be hashable. It is safe because `literals` shall not change after the formation of the clause.
+We also add `__hash__ ` function to the `Clause` class for it to be hashable. It is safe because `literals` shall not change after the formation of the clause.
 
 ```python
 @dataclass
@@ -91,9 +92,9 @@ If a literal becomes `False`, we visit the clause that contains it. Note that if
 
 - For each assignment, we put the assigned literal into a stack pending to propagate.
 
-- In `unit_propagate`, we pop off the literal `lit` to propagate, try to rewatch `clause2lits[lit]`, until conflict or the stack becomes empty.
+- In `unit_propagate`, we pop off the literal `watching_lit` to propagate, try to rewatch `clause2lits[watching_lit]`, until conflict or the stack becomes empty.
   
-  In the figure below, if $x_6$ is to be assign `False`, only 4 possible cases may arise.
+  In the figure below, if \\(x_6\\) is to be assign `False`, only 4 possible cases might arise.
   
   ![The 2-watching literal method. The watched literals are are x 6 and x 8...  | Download Scientific Diagram](./images/The-2-watching-literal-method-The-watched-literals-are-are-x-6-and-x-8-Variable-x-6.png)
   
@@ -106,7 +107,10 @@ If a literal becomes `False`, we visit the clause that contains it. Note that if
 def unit_propagation(assignments, lit2clauses, clause2lits, to_propagate: List[Literal]) -> Tuple[str, Optional[Clause]]:
     while len(to_propagate) > 0:
         watching_lit = to_propagate.pop().neg()
-        watching_clauses = lit2clauses[watching_lit]
+
+        # use list(.) to copy it because size of 
+        # lit2clauses[watching_lit]might change during for-loop
+        watching_clauses = list(lit2clauses[watching_lit])
         for watching_clause in watching_clauses:
             for lit in watching_clause:
                 if lit in clause2lits[watching_clause]:

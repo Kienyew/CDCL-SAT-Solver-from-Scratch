@@ -211,7 +211,7 @@ Translate it into Python code:
 
 ### `cdcl_solve`
 
-We return the `learnt_clause` from `conflict_analysis`, and add the `learn_clause` to the formula afterward, and return the reason as well as the clause that are the cause of the reason from `unit_propagation`.
+We return the `learnt_clause` from `conflict_analysis`, and add the `learnt_clause` to the formula afterward, and return the reason as well as the clause that are the cause of the reason from `unit_propagation`.
 
 ```python
 def cdcl_solve(formula: Formula) -> Optional[Assignments]:
@@ -317,6 +317,33 @@ def backtrack(assignments: Assignments, b: int):
 Next is unit propagation. We detect conflict or unit clause in this function, and return the reason and the corresponding clause.
 
 ```python
+def clause_status(clause: Clause, assignments: Assignments) -> str:
+    """
+    Return the status of the clause with respect to the assignments.
+
+    There are 4 possible status of a clause:
+      1. Unit - All but one literal are assigned False
+      2. Unsatisfied - All literals are assigned False
+      3. Satisfied - All literals are assigned True
+      4. Unresolved - Neither unit, satisfied nor unsatisfied
+    """
+    values = []
+    for literal in clause:
+        if literal.variable not in assignments:
+            values.append(None)
+        else:
+            values.append(assignments.value(literal))
+
+    if True in values:
+        return 'satisfied'
+    elif values.count(False) == len(values):
+        return 'unsatisfied'
+    elif values.count(False) == len(values) - 1:
+        return 'unit'
+    else:
+        return 'unresolved'
+
+
 def unit_propagation(formula: Formula, assignments: Assignments) -> Tuple[str, Optional[Clause]]:
     # finish is set to True if no unit and conflict clause found in one iteration
     finish = False
