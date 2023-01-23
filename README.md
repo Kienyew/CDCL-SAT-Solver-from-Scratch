@@ -3,7 +3,7 @@ CDCL SAT Solver from Scratch in Python
 
 Refer to the book website for implementation details: https://kienyew.github.io/CDCL-SAT-Solver-from-Scratch/
 
-This book deployed by [mdBook](https://github.com/rust-lang/mdBook)
+This book is deployed by [mdBook](https://github.com/rust-lang/mdBook).
 
 
 ## References
