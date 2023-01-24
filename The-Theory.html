@@ -1,0 +1,369 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>The Theory - CDCL From Scratch in Python</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="CDCL-SAT-Solver-from-Scratch.html">CDCL SAT Solver from Scratch</a></li><li class="chapter-item expanded "><a href="The-Theory.html" class="active"><strong aria-hidden="true">1.</strong> The Theory</a></li><li class="chapter-item expanded "><a href="The-Implementation.html"><strong aria-hidden="true">2.</strong> The Implementation</a></li><li class="chapter-item expanded "><a href="Two-Watched-Literals.html"><strong aria-hidden="true">3.</strong> Advanced: Two-Watched Literals</a></li><li class="chapter-item expanded "><a href="Conclusion.html"><strong aria-hidden="true">4.</strong> Conclusion</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">CDCL From Scratch in Python</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="the-theory"><a class="header" href="#the-theory">The Theory</a></h1>
+<ul>
+<li>Everything in this section is taken from <a href="https://www.cs.princeton.edu/~zkincaid/courses/fall18/readings/SATHandbook-CDCL.pdf">Handbook of Satisfiability Chapter 4: Conflict-Driven Clause Learning SAT Solvers</a>.</li>
+</ul>
+<p>CDCL SAT solvers primarily inspired by DPLL solvers. DPLL corresponds to <strong>backtrack search</strong>, where each step a variable and a propositional value are selected for branching purposes. With each branching step, two values can be assigned to a variable: 0 or 1. Branching corresponds to assign the chosen value to the chosen variable. Afterwards, the logical consequences of each branching step are evaluated. Each time an unsatisfied clause (conflict) is identified, <strong>backtracking</strong> is executed.</p>
+<p>If for the first branching step, both values have been considered, and backtracking undoes this first branching step, then the CNF formula can be declared <strong>unsatisfiable</strong>. This kind of backtrack is called <strong>chronological backtracking</strong>. Alternative backtracking scheme is <strong>non-chronological backtracking</strong>, which described later.</p>
+<p>A state-of-art CDCL SAT solver involves a number of key techniques:</p>
+<ul>
+<li>Learning new clause from conflicts during backtrack search.</li>
+<li>Exploiting structure of conflicts during clause learning.</li>
+<li>Branching and restart heuristics.</li>
+</ul>
+<p>I won't cover branching and restart heuristic here. They can be added to the code space relatively easily.</p>
+<h2 id="1-notation"><a class="header" href="#1-notation">1. Notation</a></h2>
+<p>Propositional formulas are represented in Conjunctive Normal form (CNF).</p>
+<ul>
+<li>A finite set of Boolean variables \(X=\{x_1,x_2,\cdots,x_n\}\) is assumed.</li>
+<li>We use \(w\) to denote a clause.</li>
+<li>We use \(\phi\) to denote a CNF formula, consists of a conjunction of clauses.</li>
+<li>A literal \(l\) is either a variable \(x\) or its complement \(¬ x\).</li>
+</ul>
+<h4 id="assignments"><a class="header" href="#assignments">Assignments</a></h4>
+<p>Assignments to the problem variables can be defined as a function \(\nu:X\to\{0,u,1\}\) where \(u\) denotes an <strong>undefined</strong> value.</p>
+<ul>
+<li>If all variables are assigned a value \(\{0,1\}\), then \(\nu\) is referred to as a <strong>complete assignment</strong>, otherwise it is a partial assignment.</li>
+<li>\(l^\nu\) denotes the value of a literal \(l\) under assignment \(\nu\).</li>
+<li>\(w^\nu\) denotes the value of a clause \(w\) under assignment \(\nu\).</li>
+<li>\(\phi^\nu\) denotes the value of the formula \(\phi\) under assignment \(\nu\).</li>
+</ul>
+<p>\[
+\begin{align}
+l^\nu &amp;= \begin{cases}
+\nu(x_i),&amp;l=x_i \\
+1-\nu(x_i),&amp;l=¬ x_i
+\end{cases} \\
+w^\nu &amp;= \max\{l^\nu | l\in w\} \\
+\phi^\nu &amp;= \min\{w^\nu | w\in\phi\}
+\end{align}
+\]</p>
+<h4 id="clauses"><a class="header" href="#clauses">Clauses</a></h4>
+<p>Clauses are characterized as <strong>unsatisfied</strong>, <strong>satisfied</strong>, <strong>unit</strong>, or <strong>unresolved</strong>.</p>
+<ul>
+<li>A clause is <strong>unsatisfied</strong> if all its literals are assigned to value 0 under the assignment.</li>
+<li>A clause is <strong>unit</strong> if all literals but one are assigned value 0, and the one literal are unassigned.</li>
+<li>A clause is <strong>satisfied</strong> if at least one of its literal is assigned to value 1.</li>
+<li>A clause is <strong>unresolved</strong> if neither falls in satisfied, unsatisfied or unit.</li>
+</ul>
+<p>A key procedure in SAT solvers is the <strong>unit clause rule</strong>: if a clause is unit, then its sole unassigned literal must be assigned to value 1. The iterated application of unit clause rule is referred to as <strong>unit propagation</strong> or <strong>Boolean constraint propagation (BCP)</strong>.</p>
+<p>Unit propagation is applied after each branching step, and is used for identifying variables which must be assigned a specific Boolean value. If an unsatisfied clause is identified, a <strong>conflict</strong> condition is declared, and the algorithm backtracks.</p>
+<h4 id="value-antecedent-and-decision-level"><a class="header" href="#value-antecedent-and-decision-level">Value, Antecedent and Decision Level</a></h4>
+<p>Each variable \(x_i\) is characterized by a number of properties, including the <strong>value</strong>, <strong>antecedent</strong> and the <strong>decision level</strong> of it.</p>
+<p>The <strong>value</strong> of \(x_i\) is the assigned value of it given the assignment</p>
+<p>\[
+\nu(x_i) \in \{0,u,1\}
+\]</p>
+<p>where 0 = False, 1 = True, \(u\) = Unassigned.</p>
+<p>The <strong>antecedent</strong> of \(x_i\) is the unit clause \(w\) that implies it. For unassigned variables, or variables that are assigned by decision, then their antecedent is \(\tt NIL\).</p>
+<p>$$
+\alpha(x_i) \in \phi \cup\{\tt{NIL}\}
+$$</p>
+<p>The <strong>decision level</strong> for a variable \(x_i\) denotes the depth of the decision tree at which the variable is assigned a value in \(\{0,1\}\). The decision level for an unassigned value \(x_i\) is \(-1\).</p>
+<p>$$
+\delta(x_i) = \max(\{0\}\cup \{\delta(x_j) \mid x_j \in w ∧ x_j \ne x_i\})
+$$</p>
+<p>The formula above says that the decision level of an implied literal is either the highest decision level of the implied literals in a unit clause, or \(0\) if the clause is unit.</p>
+<p>We use \(x_i = v@d\) to denote that \(\nu(x_i) = v\) and \(\delta(x_i = d)\).</p>
+<h4 id="implication-graph"><a class="header" href="#implication-graph">Implication Graph</a></h4>
+<p>During the execution of DPLL-style SAT solver, assigned variables as well as their antecedents define a directed acyclic graph \(I=(V_I,E_I)\) referred to as <strong>implication graph</strong>.</p>
+<p>The vertices in the implication graph are defined by all assigned variables and possibly one special node \(\kappa\) - the conflict node. The edges in the implication graph are obtained from the antecedent of each assigned variable. If \(w=\alpha(x_i)\), then there is a directed edge from each variable in \(w\) (other than \(x_i\) to \(x_i\).</p>
+<p>If unit propagation yields an unsatisfied clause \(w_j\), then a special vertex \(\kappa\) is used to represent the unsatisfied clause. The antecedent of \(\kappa\) is defined by \(\alpha(\kappa) = w_j\).</p>
+<p><strong>Example</strong>:</p>
+<p>Consider the CNF:</p>
+<p>\[
+\begin{align}
+\phi_i &amp;= w_1∧ w_2 ∧ w_3 \\
+&amp;= (x_1 ∨ x_{31} ∨ ¬ x_2) ∧ (x_1 ∨ ¬ x_3) ∧ (x_2 ∨ x_3 ∨ x_4)
+\end{align}
+\]</p>
+<p>and assume the decision assignment \(x_{31}=0@3\) and \(x_1 = 0@5\), then their implication graph is:</p>
+<p><img src="./images/image-20221224153730404.png" alt="image-20221224153730404" /></p>
+<h2 id="2-organization-of-cdcl-solvers"><a class="header" href="#2-organization-of-cdcl-solvers">2. Organization of CDCL Solvers</a></h2>
+<p>The figure shows the typical algorithm for CDCL:</p>
+<p><img src="./images/image-20221224154721848.png" alt="image-20221224154721848" /></p>
+<p>The main differences to DPLL solver is the call to function \(\tt ConflictAnalysis\) each time a conflict is identified, and a call to \(\tt BackTrack\) when backtracking takes place.</p>
+<ul>
+<li>\(\tt UnitPropagation\) consists of the iterated application of the unit clause rule. If an unsatisfied clause is identified, then a conflict indication is returned.</li>
+<li>\(\tt PickBranchingValue\) selects a variable to assign a value.</li>
+<li>\(\tt ConflictAnalysis\) analyzes the most recent conflict and learn a new clause from the conflict.</li>
+<li>\(\tt AllVariablesAssigned\) tests whether all variables have been assigned.</li>
+</ul>
+<p>Some techniques like <strong>search restarts</strong> and <strong>clause deletion</strong> are not included in the algorithm above.</p>
+<ul>
+<li><strong>Search restarts</strong> cause the algorithm to restart itself, but already learnt clauses are kept.</li>
+<li><strong>Clause deletion</strong> policies decide which learnt clauses can be deleted to saves memory.</li>
+</ul>
+<h2 id="3-conflict-analysis"><a class="header" href="#3-conflict-analysis">3. Conflict Analysis</a></h2>
+<h3 id="learning-clauses-from-conflicts"><a class="header" href="#learning-clauses-from-conflicts">Learning Clauses from Conflicts</a></h3>
+<p>Each time the CDCL SAT solver identifies a conflict due to unit propagation, the \(\tt ConflictAnalysis\) procedure is invoked. One or more new clauses are learnt, and a backtracking decision level is computed.</p>
+<p>Starting from a given conflict clause \(\alpha(\kappa)\), the conflict analysis procedure visits variables implied at the most recent decision level, identifies the antecedents of visited variables, and keeps from the antecedents of literals assigned at decision level <strong>less than the most recent decision level</strong>. This process is repeated until the most recent decision variable is visited.</p>
+<p>Let \(\odot\) be the resolution operation. The resolution operation on two clause \(w_i\) and \(w_j\), for which there is a variable that \(x\) in one clause and \(¬ x\) in another clause, then the result of the resolution operation is all literals in \(w_i\) and \(w_j\) with the exception of \(x\) and \(¬ x\):</p>
+<p>$$
+w_i \odot w_j = w_i \cup w_j - \{x,¬ x\}
+$$</p>
+<p>Now we show how the new clause is learnt. The clause learning process in SAT solvers can be defined by a sequence of selective resolution operations. At each step, it yields a new temporary clause, and the final clause is the newly learnt clause.</p>
+<p>First, we define a predicate \(\xi(w,l,d)\) which means if a clause \(w\) has an implied literal \(l\) assigned at the current decision level \(d\).</p>
+<p>\[
+\xi(w,l,d) = \begin{cases}
+1,&amp;l\in w ∧ \delta (l) =d ∧ \alpha(l) \ne \tt NIL \\
+0,&amp;\text {otherwise}
+\end{cases}
+\]</p>
+<p>Let \(w_L^{d,i}\) with \(i=0,1,\cdots\) be the <strong>intermediate clause</strong> obtained after \(i\) resolution operations.</p>
+<p>\[
+w_L^{d,i} = \begin{cases}
+\alpha(\kappa),&amp;i=0 \\
+w_L^{d,i-1} \odot \alpha(l).&amp;i\ne 0 ∧ \xi(w_L^{d,i-1},l,d) = 1 \\
+w_L^{d,i-1},&amp; i\ne 0 ∧ \forall _l \xi(w_L^{d,i-1},l,d)=0
+\end{cases}
+\]</p>
+<p>The explanation of \(w_L^{d,i}\):</p>
+<ul>
+<li>The initial intermediate clause is the antecedent of \(\kappa\), \(\alpha(\kappa)\).</li>
+<li>Afterwards, at each step \(i\), a literal \(l\) assigned at the current decision level \(d\) is selected from the current intermediate clause, the next intermediate clause \(w_{L}^{d,i}\) is the result of resolution between the current intermediate clause:</li>
+</ul>
+<p>$$
+w_L^{d,i} = w_L^{d,i-1} \odot \alpha(l)
+$$</p>
+<ul>
+<li>This continues until there left no literal in current intermediate clause with current decision level \(d\), or</li>
+</ul>
+<p>$$
+w_L^{d,i} = w_L^{d,i-1}
+$$</p>
+<p>The last intermediate clause is the new learnt clause. The number of resolutions performed will not greater than number of variables \(|X|\).</p>
+<p><strong>Example</strong>: Given the formula, with the implication graph</p>
+<p>\[
+\begin{align}
+\phi &amp;= w_1 ∧ w_2 ∧ w_3 ∧ w_4 ∧ w_5 ∧ w_6 \\
+&amp;= (x_1 ∨ x_{31} ∨ ¬ x_2) ∧ (x_1 ∨ ¬ x_3) ∧ (x_2 ∨ x_3 ∨ x_3) \\
+&amp;~~~~~(¬ x_4 ∧ ¬ x_5) ∧ (x_{21} ∨ ¬ x_4 ∨ ¬ x_6) ∧ (x_5 ∨ x_6)
+\end{align}
+\]</p>
+<p><img src="./images/image-20221224172134735.png" alt="image-20221224172134735" /></p>
+<p>The table shows the resolution steps during clause learning.</p>
+<img src="./images/image-20221224172210628.png" alt="image-20221224172210628" style="zoom: 67%;" />
+<p>There are many possible clauses to learn on one conflict. The learnt clause of method above is just the negation of literals of most recent decision level. However, we usually learn a new exploit the first UIP cut, explained in the next section:</p>
+<h3 id="exploiting-structure-with-uips"><a class="header" href="#exploiting-structure-with-uips">Exploiting Structure with UIPs</a></h3>
+<p>A vertex \(u\) dominates another vertex \(x\) in a directed graph if every path from \(x\) to another vertex \(\kappa\) contains \(u\). A UIP (unique implication point) is a <strong>dominator</strong> in the implication graph, which dominates the decision vertex \(x\) with respect to the conflict vertex \(\kappa\).</p>
+<p>In the implication graph, there is an UIP at decision level \(d\) when the number of literals in \(w_L^{d,i}\) assigned at decision level is 1. Let \(\sigma(w,d)\) be the number of literals in \(w\) assigned at decision level \(d\):</p>
+<p>$$
+\sigma(w,d) = |\{l \in w \mid \delta(l) = d\}|
+$$</p>
+<p>The clause learning procedure with UIPs is given by</p>
+<p>\[
+w_L^{d,i} = \begin{cases}
+\alpha(\kappa),&amp;i=0 \\
+w_L^{d,i-1} \odot \alpha(l).&amp;i\ne 0 ∧ \xi(w_L^{d,i-1},l,d) = 1 \\
+w_L^{d,i-1},&amp; i\ne 0 ∧ \sigma(w_L^{d,i-1},d) = 1
+\end{cases}
+\]</p>
+<p>CDCL SAT solvers stop clause learning at the first UIP.</p>
+<p><strong>Example</strong>: Again with the previous example</p>
+<p>\[
+\begin{align}
+\phi &amp;= w_1 ∧ w_2 ∧ w_3 ∧ w_4 ∧ w_5 ∧ w_6 \\
+&amp;= (x_1 ∨ x_{31} ∨ ¬ x_2) ∧ (x_1 ∨ ¬ x_3) ∧ (x_2 ∨ x_3 ∨ x_3) \\
+&amp;~~~~~(¬ x_4 ∧ ¬ x_5) ∧ (x_{21} ∨ ¬ x_4 ∨ ¬ x_6) ∧ (x_5 ∨ x_6)
+\end{align}
+\]</p>
+<p><img src="./images/image-20221224172134735.png" alt="image-20221224172134735" /></p>
+<p>The learning procedure stops at \((¬ x_4 ∨ x_{21})\) by taking into consideration that \(x_4=1@5\) is a UIP - the first UIP.</p>
+<img src="./images/image-20221224174926922-16743682034371.png" alt="image-20221224174926922" style="zoom:67%;" />
+<p>Finally, we start the code in next section.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="CDCL-SAT-Solver-from-Scratch.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="The-Implementation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="CDCL-SAT-Solver-from-Scratch.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="The-Implementation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>
