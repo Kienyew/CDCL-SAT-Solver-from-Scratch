@@ -14,11 +14,11 @@ class Literal:
 
     def __repr__(self):
         if self.negation:
-            return '¬' + str(self.variable)
+            return "¬" + str(self.variable)
         else:
             return str(self.variable)
 
-    def neg(self) -> 'Literal':
+    def neg(self) -> "Literal":
         """
         Return the negation of this literal.
         """
@@ -30,7 +30,7 @@ class Clause:
     literals: List[Literal]
 
     def __repr__(self):
-        return '∨'.join(map(str, self.literals))
+        return "∨".join(map(str, self.literals))
 
     def __iter__(self) -> Iterator[Literal]:
         return iter(self.literals)
@@ -39,7 +39,7 @@ class Clause:
         return len(self.literals)
 
     def __hash__(self):
-        x = 0 
+        x = 0
         for lit in self.literals:
             x ^= hash(lit)
         return x
@@ -69,7 +69,7 @@ class Formula:
         return self.__variables
 
     def __repr__(self):
-        return ' ∧ '.join(f'({clause})' for clause in self.clauses)
+        return " ∧ ".join(f"({clause})" for clause in self.clauses)
 
     def __iter__(self) -> Iterator[Clause]:
         return iter(self.clauses)
@@ -89,6 +89,7 @@ class Assignments(dict):
     """
     The assignments, also stores the current decision level.
     """
+
     def __init__(self):
         super().__init__()
 
@@ -112,7 +113,7 @@ class Assignments(dict):
 
     def satisfy(self, formula: Formula) -> bool:
         """
-        Check whether the assignments actually satisfies the formula. 
+        Check whether the assignments actually satisfies the formula.
         """
         for clause in formula:
             if True not in [self.value(lit) for lit in clause]:
@@ -130,8 +131,8 @@ def cdcl_solve(formula: Formula) -> Optional[Assignments]:
     """
     assignments = Assignments()
     lit2clauses, clause2lits = init_watches(formula)
-    
-    # First, do unit propagation to assign the initial unit clauses 
+
+    # First, do unit propagation to assign the initial unit clauses
     unit_clauses = [clause for clause in formula if len(clause) == 1]
     to_propagate = []
     for clause in unit_clauses:
@@ -142,8 +143,10 @@ def cdcl_solve(formula: Formula) -> Optional[Assignments]:
             assignments.assign(var, val, clause)
             to_propagate.append(lit)
 
-    reason, clause = unit_propagation(assignments, lit2clauses, clause2lits, to_propagate)
-    if reason == 'conflict':
+    reason, clause = unit_propagation(
+        assignments, lit2clauses, clause2lits, to_propagate
+    )
+    if reason == "conflict":
         return None
 
     while not all_variables_assigned(formula, assignments):
@@ -152,25 +155,42 @@ def cdcl_solve(formula: Formula) -> Optional[Assignments]:
         assignments.assign(var, val, antecedent=None)
         to_propagate = [Literal(var, not val)]
         while True:
-            reason, clause = unit_propagation(assignments, lit2clauses, clause2lits, to_propagate)
-            if reason != 'conflict':
+            reason, clause = unit_propagation(
+                assignments, lit2clauses, clause2lits, to_propagate
+            )
+            if reason != "conflict":
                 # no conflict after unit propagation, we back
                 # to the decision (guessing) step
                 break
-                
+
             b, learnt_clause = conflict_analysis(clause, assignments)
             assert learnt_clause != clause
             if b < 0:
                 return None
-            
-            add_learnt_clause(formula, learnt_clause, assignments, lit2clauses, clause2lits)
+
+            add_learnt_clause(
+                formula, learnt_clause, assignments, lit2clauses, clause2lits
+            )
             backtrack(assignments, b)
             assignments.dl = b
 
             # The learnt clause must be a unit clause, so the
             # next step must again be unit progagation
-            assert len([literal for literal in learnt_clause if literal.variable not in assignments]) == 1
-            literal = next(literal for literal in learnt_clause if literal.variable not in assignments)
+            assert (
+                len(
+                    [
+                        literal
+                        for literal in learnt_clause
+                        if literal.variable not in assignments
+                    ]
+                )
+                == 1
+            )
+            literal = next(
+                literal
+                for literal in learnt_clause
+                if literal.variable not in assignments
+            )
             var = literal.variable
             val = not literal.negation
             assignments.assign(var, val, antecedent=learnt_clause)
@@ -193,7 +213,9 @@ def all_variables_assigned(formula: Formula, assignments: Assignments) -> bool:
     return len(formula.variables()) == len(assignments)
 
 
-def pick_branching_variable(formula: Formula, assignments: Assignments) -> Tuple[int, bool]:
+def pick_branching_variable(
+    formula: Formula, assignments: Assignments
+) -> Tuple[int, bool]:
     unassigned_vars = [var for var in formula.variables() if var not in assignments]
     var = random.choice(unassigned_vars)
     val = random.choice([True, False])
@@ -210,11 +232,13 @@ def backtrack(assignments: Assignments, b: int):
         assignments.unassign(var)
 
 
-def unit_propagation(assignments, lit2clauses, clause2lits, to_propagate: List[Literal]) -> Tuple[str, Optional[Clause]]:
+def unit_propagation(
+    assignments, lit2clauses, clause2lits, to_propagate: List[Literal]
+) -> Tuple[str, Optional[Clause]]:
     while len(to_propagate) > 0:
         watching_lit = to_propagate.pop().neg()
 
-        # use list(.) to copy it because size of 
+        # use list(.) to copy it because size of
         # lit2clauses[watching_lit]might change during for-loop
         watching_clauses = list(lit2clauses[watching_lit])
         for watching_clause in watching_clauses:
@@ -239,22 +263,28 @@ def unit_propagation(assignments, lit2clauses, clause2lits, to_propagate: List[L
                 if len(watching_lits) == 1:
                     # watching_clause is unit clause, and the only literal
                     # is assigned False, thus indicates a conflict
-                    return ('conflict', watching_clause)
-               	
+                    return ("conflict", watching_clause)
+
                 # the other watching literal
-                other = watching_lits[0] if watching_lits[1] == watching_lit else watching_lits[1]
+                other = (
+                    watching_lits[0]
+                    if watching_lits[1] == watching_lit
+                    else watching_lits[1]
+                )
                 if other.variable not in assignments:
                     # the other watching literal is unassigned. (case 3)
-                    assignments.assign(other.variable, not other.negation, watching_clause)
+                    assignments.assign(
+                        other.variable, not other.negation, watching_clause
+                    )
                     to_propagate.insert(0, other)
                 elif assignments.value(other) == True:
                     # the other watching literal is assigned True. (case 2)
                     continue
                 else:
                     # the other watching literal is assigned False. (case 4)
-                    return ('conflict', watching_clause)
+                    return ("conflict", watching_clause)
 
-    return ('unresolved', None)
+    return ("unresolved", None)
 
 
 def resolve(a: Clause, b: Clause, x: int) -> Clause:
@@ -271,10 +301,16 @@ def conflict_analysis(clause: Clause, assignments: Assignments) -> Tuple[int, Cl
         return (-1, None)
 
     # literals with current decision level
-    literals = [literal for literal in clause if assignments[literal.variable].dl == assignments.dl]
+    literals = [
+        literal
+        for literal in clause
+        if assignments[literal.variable].dl == assignments.dl
+    ]
     while len(literals) != 1:
         # implied literals
-        literals = filter(lambda lit: assignments[lit.variable].antecedent != None, literals)
+        literals = filter(
+            lambda lit: assignments[lit.variable].antecedent != None, literals
+        )
 
         # select any literal that meets the criterion
         literal = next(literals)
@@ -282,12 +318,18 @@ def conflict_analysis(clause: Clause, assignments: Assignments) -> Tuple[int, Cl
         clause = resolve(clause, antecedent, literal.variable)
 
         # literals with current decision level
-        literals = [literal for literal in clause if assignments[literal.variable].dl == assignments.dl]
+        literals = [
+            literal
+            for literal in clause
+            if assignments[literal.variable].dl == assignments.dl
+        ]
 
     # out of the loop, `clause` is now the new learnt clause
     # compute the backtrack level b (second largest decision level)
 
-    decision_levels = sorted(set(assignments[literal.variable].dl for literal in clause))
+    decision_levels = sorted(
+        set(assignments[literal.variable].dl for literal in clause)
+    )
     if len(decision_levels) <= 1:
         return 0, clause
     else:
@@ -321,10 +363,10 @@ def init_watches(formula: Formula):
     """
     Return lit2clauses and clause2lits
     """
-    
+
     lit2clauses = defaultdict(list)
     clause2lits = defaultdict(list)
-    
+
     for clause in formula:
         if len(clause) == 1:
             lit2clauses[clause.literals[0]].append(clause)
@@ -334,25 +376,25 @@ def init_watches(formula: Formula):
             lit2clauses[clause.literals[1]].append(clause)
             clause2lits[clause].append(clause.literals[0])
             clause2lits[clause].append(clause.literals[1])
-            
+
     return lit2clauses, clause2lits
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # you might comment it to get inconsistent execution time
     random.seed(5201314)
 
     if len(sys.argv) != 2:
-        print('Provide one DIMACS cnf filename as argument.')
+        print("Provide one DIMACS cnf filename as argument.")
         sys.exit(1)
-        
+
     dimacs_cnf = open(sys.argv[1]).read()
     formula = parse_dimacs_cnf(dimacs_cnf)
     result = cdcl_solve(formula)
     if result:
         assert result.satisfy(formula)
-        print('Formula is SAT with assignments:')
+        print("Formula is SAT with assignments:")
         assignments = {var: assignment.value for var, assignment in result.items()}
         pprint(assignments)
     else:
-        print('Formula is UNSAT.')
+        print("Formula is UNSAT.")
