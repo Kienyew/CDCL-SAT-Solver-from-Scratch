@@ -3,7 +3,7 @@ import random
 from pprint import pprint
 from dataclasses import dataclass
 from collections import defaultdict
-from typing import List, Set, Tuple, Optional, Iterator
+from typing import List, Set, Tuple, Optional, Iterator, TypeAlias, Dict
 
 
 # frozen to be hashable
@@ -43,6 +43,10 @@ class Clause:
         for lit in self.literals:
             x ^= hash(lit)
         return x
+
+
+LiteralClauseDict: TypeAlias = Dict["Literal", List["Clause"]]
+ClauseLiteralDict: TypeAlias = Dict["Clause", List["Literal"]]
 
 
 @dataclass
@@ -85,7 +89,7 @@ class Assignment:
     dl: int  # decision level
 
 
-class Assignments(dict):
+class Assignments(dict[int, Assignment]):
     """
     The assignments, also stores the current decision level.
     """
@@ -134,7 +138,7 @@ def cdcl_solve(formula: Formula) -> Optional[Assignments]:
 
     # First, do unit propagation to assign the initial unit clauses
     unit_clauses = [clause for clause in formula if len(clause) == 1]
-    to_propagate = []
+    to_propagate: List["Literal"] = []
     for clause in unit_clauses:
         lit = clause.literals[0]
         var = lit.variable
@@ -158,14 +162,14 @@ def cdcl_solve(formula: Formula) -> Optional[Assignments]:
             reason, clause = unit_propagation(
                 assignments, lit2clauses, clause2lits, to_propagate
             )
-            if reason != "conflict":
+            if reason != "conflict" or clause == None:
                 # no conflict after unit propagation, we back
                 # to the decision (guessing) step
                 break
 
             b, learnt_clause = conflict_analysis(clause, assignments)
             assert learnt_clause != clause
-            if b < 0:
+            if b < 0 or learnt_clause == None:
                 return None
 
             add_learnt_clause(
@@ -175,7 +179,7 @@ def cdcl_solve(formula: Formula) -> Optional[Assignments]:
             assignments.dl = b
 
             # The learnt clause must be a unit clause, so the
-            # next step must again be unit progagation
+            # next step must again be unit propagation
             assert (
                 len(
                     [
@@ -199,7 +203,13 @@ def cdcl_solve(formula: Formula) -> Optional[Assignments]:
     return assignments
 
 
-def add_learnt_clause(formula, clause, assignments, lit2clauses, clause2lits):
+def add_learnt_clause(
+    formula: Formula,
+    clause: Clause,
+    assignments: Assignments,
+    lit2clauses: LiteralClauseDict,
+    clause2lits: ClauseLiteralDict,
+):
     formula.clauses.append(clause)
     for lit in sorted(clause, key=lambda lit: -assignments[lit.variable].dl):
         if len(clause2lits[clause]) < 2:
@@ -223,7 +233,7 @@ def pick_branching_variable(
 
 
 def backtrack(assignments: Assignments, b: int):
-    to_remove = []
+    to_remove: List[int] = []
     for var, assignment in assignments.items():
         if assignment.dl > b:
             to_remove.append(var)
@@ -233,7 +243,10 @@ def backtrack(assignments: Assignments, b: int):
 
 
 def unit_propagation(
-    assignments, lit2clauses, clause2lits, to_propagate: List[Literal]
+    assignments: Assignments,
+    lit2clauses: LiteralClauseDict,
+    clause2lits: ClauseLiteralDict,
+    to_propagate: List[Literal],
 ) -> Tuple[str, Optional[Clause]]:
     while len(to_propagate) > 0:
         watching_lit = to_propagate.pop().neg()
@@ -296,7 +309,9 @@ def resolve(a: Clause, b: Clause, x: int) -> Clause:
     return Clause(result)
 
 
-def conflict_analysis(clause: Clause, assignments: Assignments) -> Tuple[int, Clause]:
+def conflict_analysis(
+    clause: Clause, assignments: Assignments
+) -> Tuple[int, Optional[Clause]]:
     if assignments.dl == 0:
         return (-1, None)
 
@@ -315,6 +330,8 @@ def conflict_analysis(clause: Clause, assignments: Assignments) -> Tuple[int, Cl
         # select any literal that meets the criterion
         literal = next(literals)
         antecedent = assignments[literal.variable].antecedent
+        if antecedent == None:
+            break
         clause = resolve(clause, antecedent, literal.variable)
 
         # literals with current decision level
@@ -364,8 +381,8 @@ def init_watches(formula: Formula):
     Return lit2clauses and clause2lits
     """
 
-    lit2clauses = defaultdict(list)
-    clause2lits = defaultdict(list)
+    lit2clauses: LiteralClauseDict = defaultdict(list)
+    clause2lits: ClauseLiteralDict = defaultdict(list)
 
     for clause in formula:
         if len(clause) == 1:
