@@ -2,7 +2,15 @@ import sys
 import random
 from pprint import pprint
 from dataclasses import dataclass
-from typing import List, Set, Tuple, Optional, Iterator
+from typing import (
+    List,
+    Set,
+    Tuple,
+    Optional,
+    Iterator,
+    TypeAlias,
+    Literal as TypeLiteral,
+)
 
 
 # frozen to be hashable
@@ -37,6 +45,9 @@ class Clause:
 
     def __len__(self):
         return len(self.literals)
+
+
+ClauseState: TypeAlias = TypeLiteral["unit", "unsatisfied", "satisfied", "unresolved"]
 
 
 @dataclass
@@ -79,7 +90,7 @@ class Assignment:
     dl: int  # decision level
 
 
-class Assignments(dict[int, "Assignment"]):
+class Assignments(dict[int, Assignment]):
     """
     The assignments, also stores the current decision level.
     """
@@ -182,7 +193,7 @@ def backtrack(assignments: Assignments, b: int):
         assignments.unassign(var)
 
 
-def clause_status(clause: Clause, assignments: Assignments) -> str:
+def clause_status(clause: Clause, assignments: Assignments) -> ClauseState:
     """
     Return the status of the clause with respect to the assignments.
 
@@ -198,7 +209,6 @@ def clause_status(clause: Clause, assignments: Assignments) -> str:
             values.append(None)
         else:
             values.append(assignments.value(literal))
-
     if True in values:
         return "satisfied"
     elif values.count(False) == len(values):
