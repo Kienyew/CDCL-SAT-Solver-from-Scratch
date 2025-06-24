@@ -200,7 +200,7 @@ def clause_status(clause: Clause, assignments: Assignments) -> ClauseState:
     There are 4 possible status of a clause:
       1. Unit - All but one literal are assigned False
       2. Unsatisfied - All literals are assigned False
-      3. Satisfied - All literals are assigned True
+      3. Satisfied - Any literal is assigned True
       4. Unresolved - Neither unit, satisfied nor unsatisfied
     """
     values: List[Optional[bool]] = []
